@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query,Path
 from enum import Enum
 from pydantic import BaseModel
 from typing import Optional
 from Item import Item
+
 
 class ModelName(str, Enum):
     alexnet = "alexnet"
@@ -66,9 +67,31 @@ async def read_user_item(
     return item
 
 @app.post("/item_test/{item_id}")
-async def create_item(item_id: int, item: Item):
+async def create_item(item_id: int, item: Item, q: Optional[str]= None):
     item.name =  "hihi"
-    return {"item_id": item_id, **item.dict()}
+    result = {"item_id": item_id, **item.dict()}
+    if q:
+        result.update({"q": q})
+    return result
+
+@app.get("/items_test/")
+async def read_items(q: Optional[str]= Query(None, max_length=50)):
+    results =  {"items": [{"item_id": "Foo"}, {"item"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+@app.get('/items_path/{item_id}')
+async def read_items(
+        item_id : int = Path(..., title="The ID of the item to get"),
+        q: Optional[str] =  Query(None, alias="item-query")
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q" : q})
+    return results
+
+
 
 
 
