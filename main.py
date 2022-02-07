@@ -1,5 +1,9 @@
 from fastapi import FastAPI
 from enum import Enum
+from pydantic import BaseModel
+from typing import Optional
+from Item import Item
+
 class ModelName(str, Enum):
     alexnet = "alexnet"
     resnet = "resnet"
@@ -61,6 +65,10 @@ async def read_user_item(
         )
     return item
 
+@app.post("/item_test/{item_id}")
+async def create_item(item_id: int, item: Item):
+    item.name =  "hihi"
+    return {"item_id": item_id, **item.dict()}
 
 
 
