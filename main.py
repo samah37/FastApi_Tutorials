@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Query,Path
+from fastapi import FastAPI, Query, Path, Body, Cookie
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from Item import Item
+
 
 
 class ModelName(str, Enum):
@@ -90,6 +91,26 @@ async def read_items(
     if q:
         results.update({"q" : q})
     return results
+
+class User(BaseModel):
+    username: str
+    full_name: Optional[str] = None
+
+@app.put("/items/{item_id}")
+async  def update_item(
+        item_id: int, item: Item, user: User, importance: int= Body(...)
+):
+    results = {"item_id": item_id, "item": item, "user": user, "importance": importance }
+    return results
+class ItemField(BaseModel):
+    name: str
+    description: Optional[str] =  Field(None, title = "the description of the item", max_length=300)
+    price: float = Field(..., gt=0, description="the price must hh")
+
+
+
+
+
 
 
 
